@@ -1,0 +1,12 @@
+.site-header{
+  height: 70px;
+  background-color: $graphite;
+  .container{
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+}
+.site-logo{
+  display: inline-flex;
+}

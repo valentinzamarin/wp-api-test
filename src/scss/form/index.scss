@@ -1,0 +1,55 @@
+@import "select";
+
+.site-form {
+  margin-bottom: $indent-lg;
+  &__fields{
+    display: flex;
+    flex-wrap: nowrap;
+    gap: $indent-md;
+    margin-bottom: $indent-md;
+  }
+  &__group{
+    position: relative;
+    width: 100%;
+    flex: 0 0 100%;
+    max-width: 360px;
+  }
+  &__button {
+    display: flex;
+    width: 260px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    border: 0;
+    background-color: $red;
+    color: $white;
+    font-family: 'FuturaDemi';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  label {
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 25px;
+    margin-bottom: 10px;
+  }
+
+  input[type="text"] {
+    border: 1px solid $gray-darker;
+    outline: none;
+    display: flex;
+    height: 60px;
+    padding: 0px 20px;
+    align-items: center;
+    width: 100%;
+  }
+  #category{
+    cursor: pointer;
+  }
+}

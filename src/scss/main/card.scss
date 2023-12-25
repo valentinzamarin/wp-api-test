@@ -1,0 +1,51 @@
+.card{
+  display: flex;
+  flex-direction: column;
+  background-color: $white;
+  &__picture{
+    display: flex;
+  }
+  &__meta{
+    display: flex;
+    flex-direction: column;
+    padding-top: $indent-sm;
+    padding-bottom: $indent-sm;
+    gap: $indent-sm;
+    color: #777;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 14px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    a{
+      font-weight: bold;
+      color: $graphite;
+      transition: .3s;
+      &:hover{
+        color: $red;
+      }
+      &:after{
+        content:' • ';
+      }
+      &:last-child{
+        &:after{
+          content: none;
+        }
+      }
+    }
+  }
+  &__wrap{
+    max-width: 300px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  &__title{
+    font-size: 25px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 25px;
+    margin-bottom: 10px;
+  }
+}

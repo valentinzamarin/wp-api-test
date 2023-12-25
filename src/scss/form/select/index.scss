@@ -1,0 +1,51 @@
+.select{
+  position: relative;
+  display: flex;
+  align-items: center;
+  svg{
+    transition: transform .3s;
+    position: absolute;
+    right: 20px;
+  }
+  &__list{
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    border: 1px solid $graphite;
+  }
+  &__option{
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 25px;
+    background: $white;
+    height: 45px;
+    width: 100%;
+    transition: .3s;
+    cursor: pointer;
+    &:hover{
+      color: $red;
+    }
+  }
+  &__back{
+    color: $asphalt;
+  }
+}
+.active{
+  input[type="text"]{
+    border: 1px solid $graphite!important;
+  }
+  svg{
+    transform: rotate(180deg);
+  }
+  .select__list{
+    display: block;
+  }
+}
