@@ -33,13 +33,7 @@ const Card = (options ) =>{
             </svg>
         </div>
         <div class="authors__names">
-            Н. Дмитриева, С. Строителев
-        </div>
-        <div>
-            
-        </div>
-        <div>
-
+            ${options.author}
         </div>
     </footer>
 </article>`

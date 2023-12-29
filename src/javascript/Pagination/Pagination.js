@@ -1,131 +1,149 @@
-import { postsList } from "../variables/postsList";
-import Card from "../List/utility/card";
+import {postsList} from "../variables/postList";
+import listHandler from "../List/listHandler";
 
-export default class Pagination{
-    constructor( postApiHandler, paged = 1, perPage = 3 ) {
-        this.postApiHandler = postApiHandler;
-
-        this.paged = paged;
-        this.perPage = perPage;
-
-        this.postsListObserver();
+export default class Pagination {
+    constructor(page) {
+        this.posts = null
+        this.page = page;
     }
-    
 
-    async initPagination() {
+    init(posts) {
 
-        try {
-            const allPosts = await this.postApiHandler.fetchPostData(1, -1);
-            let totalPostPages = Math.ceil(allPosts.length / this.perPage);
-            this.createPagination( totalPostPages )
-        } catch (error) {
-            console.error('Ошибка при загрузке постов:', error);
+        let prevPagination = document.querySelector('.pagination');
+
+        if (posts.length === 0 && prevPagination !== null) {
+            /**
+             * обнаружил баг, что можно создать пагинацию с пустым значением posts.
+             */
+            prevPagination.remove();
+            return false;
+        } else if (prevPagination !== null) {
+            prevPagination.remove();
         }
 
+        this.createPagination(posts)
+        return this.posts = posts;
     }
 
-    createPagination( total ) {
+    createPagination(posts) {
+        let numberOfPages = Math.ceil(posts.length / 3);
 
-        this.paginationWrapper = document.createElement('div');
-        this.paginationWrapper.classList.add('pagination');
+        if (numberOfPages === 1) {
+            return false;
+        }
 
-        const loadmoreButton = document.createElement('button');
-        loadmoreButton.classList.add('pagination__loadmore');
-        loadmoreButton.textContent = 'Загрузить еще';
-        loadmoreButton.dataset.max = total;
+        let paginationWrapper = document.createElement('div');
+        paginationWrapper.classList.add('pagination');
 
-        loadmoreButton.addEventListener('click', ( event ) => {
-            this.loadmoreButtonHandler( event )
-        });
+        if (this.page !== numberOfPages) {
+            const loadmoreButton = document.createElement('button');
+            loadmoreButton.classList.add('pagination__loadmore');
+            loadmoreButton.textContent = 'Загрузить еще';
+            loadmoreButton.dataset.max = numberOfPages;
 
-        this.paginationWrapper.appendChild(loadmoreButton);
+            loadmoreButton.addEventListener('click', (event) => {
+                this.loadmoreButtonHandler(event)
+            });
+
+            paginationWrapper.appendChild(loadmoreButton);
+        }
 
         const numericPagination = document.createElement('div');
         numericPagination.classList.add('pagination__pages');
 
-        for (let i = 1; i <= total; i++) {
+        const previousButton = document.createElement('a');
+        previousButton.classList.add('pagination__arrow', 'pagination__prev')
+        previousButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 4.99085L12.9159 4L18 9.5L12.9159 15L12 14.0091L15.5211 10.2H1V8.79999H15.5211L12 4.99085Z" fill="#302F2D"/></svg>';
+        previousButton.dataset.action = 'minus';
+
+        previousButton.addEventListener('click', (event) => {
+            this.paginationArrowsHandler(event);
+        });
+
+        if (this.page === 1) {
+            previousButton.style.display = 'none';
+        }
+        numericPagination.appendChild(previousButton);
+        for (let i = 1; i <= numberOfPages; i++) {
             const pageButton = document.createElement('a');
             pageButton.textContent = i;
-            pageButton.href='#';
+            pageButton.href = '#';
 
-            pageButton.addEventListener('click', ( event ) => {
-                this.numericPageHandler( event )
+            pageButton.addEventListener('click', (event) => {
+                this.numericPageHandler(event)
             });
-            if( i === 1 ) {
-                pageButton.classList.add('active');
-            }
-            if (i === total) {
-                pageButton.classList.add('last-page'); // Добавляем класс для последнего элемента
-            }
+
 
             numericPagination.appendChild(pageButton);
         }
 
-        this.paginationWrapper.appendChild(numericPagination);
+
+        const nextButton = document.createElement('a');
+        nextButton.classList.add('pagination__arrow', 'pagination__next')
+        nextButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 4.99085L12.9159 4L18 9.5L12.9159 15L12 14.0091L15.5211 10.2H1V8.79999H15.5211L12 4.99085Z" fill="#302F2D"/></svg>';
+        nextButton.dataset.action = 'plus';
+
+        nextButton.addEventListener('click', (event) => {
+            this.paginationArrowsHandler(event);
+        });
+
+        if (this.page == numberOfPages) {
+            nextButton.style.display = 'none';
+        }
+        numericPagination.appendChild(nextButton);
+
+        paginationWrapper.appendChild(numericPagination);
 
 
-        postsList.insertAdjacentElement('afterend', this.paginationWrapper );
+        postsList.insertAdjacentElement('afterend', paginationWrapper);
 
+
+        document.querySelectorAll( '.pagination__pages a' ).forEach( page => {
+            if( page.textContent == this.page ) {
+                page.classList.add( 'active' );
+            } else {
+                page.classList.remove( 'active' );
+            }
+
+        })
     }
 
-    async loadmoreButtonHandler( event  ) {
+    loadmoreButtonHandler(event) {
         event.preventDefault();
 
-        let $thisButton = event.target,
-            maxPages = $thisButton.dataset.max;
+        ++this.page;
+        listHandler(this.posts, this.page);
 
-        ++this.paged;
-
-        if( this.paged == maxPages ) {
-            $thisButton.disabled = true;
-        }
-
-        this.postApiHandler.fetchPostData(this.paged, 3)
-            .then( ( posts => {
-                postsList.innerHTML += posts.map(item => Card(item)).join('')
-            }))
     }
 
-    async numericPageHandler( event ) {
+    numericPageHandler(event) {
         event.preventDefault();
 
         let $this = event.target,
-            thisPage = event.target.textContent.trim();
+            thisPage = parseInt(event.target.textContent.trim());
+            this.page = thisPage;
+        listHandler(this.posts, thisPage);
 
-        this.paged = thisPage;
-
-        this.postApiHandler.fetchPostData(this.paged, 3)
-            .then( ( posts => {
-                postsList.innerHTML = posts.map(item => Card(item)).join('')
-            }))
+        return this.page;
     }
 
-    postsListObserver() {
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
+    paginationArrowsHandler(event) {
+        event.preventDefault();
 
-                let loadmoreButton = document.querySelector( '.pagination__loadmore' ),
-                    loadmoreButtonDataset = loadmoreButton.dataset.max;
+        let $this = event.currentTarget,
+            action = $this.dataset.action;
 
-                if( loadmoreButtonDataset == this.paged ) {
-                    loadmoreButton.disabled = true;
-                } else {
-                    loadmoreButton.disabled = false;
-                }
+        switch (action) {
+            case 'plus':
+                this.page++;
+                break;
+            case 'minus':
+                this.page--
+                break;
+        }
 
-                document.querySelectorAll( '.pagination__pages a' ).forEach( page => {
-                    page.classList.remove( 'active' );
-                    if( this.paged == page.textContent.trim() ) {
-                        page.classList.add( 'active' );
-                    }
-                })
+        listHandler(this.posts, this.page);
 
-            });
-        });
-
-        const config = { attributes: true, childList: true, subtree: true, characterData: true };
-
-        observer.observe(postsList, config);
     }
 
 }

@@ -24,8 +24,7 @@ final class PostRoutes{
     function get_posts_list_data($data) {
         $args = [
             'post_type' => 'post',
-            'posts_per_page' => $data['per_page'],
-            'paged' => $data['paged'],
+            'posts_per_page' => -1,
         ];
 
         $posts = get_posts($args);
@@ -40,14 +39,16 @@ final class PostRoutes{
 
             $post_cats = $this->get_post_categories( $post->ID );
 
+
+
             $formatted_posts[] = array(
                 'id' => $post->ID,
                 'title' => $post->post_title,
                 'content' => $post->post_content,
-                'pic' => get_the_post_thumbnail_url( $post->ID, 'grid-thumb' ),
+                'pic' => get_the_post_thumbnail_url( $post->ID ),
                 'date' => get_the_date('d.m.Y, H:i', $post->ID ),
                 'categories' => $post_cats,
-//                'author' => $author_id = get_post_field ('post_author', $id);
+                'author' => $this->display_author_name( $post->ID )
 
             );
         }
@@ -68,5 +69,18 @@ final class PostRoutes{
         endforeach;
 
         return $cats;
+    }
+
+    public function display_author_name( int $id ) {
+        $author_id = get_post_field ('post_author', $id);
+
+        $author_data = get_userdata($author_id);
+
+        if ($author_data) {
+            $first_name = mb_substr($author_data->first_name, 0, 1, 'UTF-8');
+            $last_name = $author_data->last_name;
+
+            return $first_name . '. ' . $last_name;
+        }
     }
 }

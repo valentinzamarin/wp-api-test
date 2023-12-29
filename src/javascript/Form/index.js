@@ -1,54 +1,70 @@
 import Input from "./classes/Input";
 import Select from "./classes/Select";
 import dateValidator from "./utility/dateValidator";
-import APIHandler from "../API/APIHandler";
-import {postsApiUrl} from "../variables/postsApi";
-import {postsList} from "../variables/postsList";
-import Card from "../List/utility/card";
-import Pagination from "../Pagination/Pagination";
+import fetchPosts from "../API/fetchPosts";
+import listHandler from "../List/listHandler";
+
 
 export default class Form{
-    constructor( form, dateInput, select, pagination ) {
+    constructor( form ) {
         this.form = form;
+        this.formInput = this.form.querySelector( '#dateInput' );
+        this.formSelect = this.form.querySelector( '.select' );
 
-        this.dateInput = new Input( dateInput )
+
+        this.dateInput = new Input( this.formInput )
         this.dateInput.init();
 
-        this.select = new Select( select );
+        this.select = new Select( this.formSelect );
         this.select.init();
 
-        this.pagination = pagination;
 
         this.form.addEventListener( 'submit', event => {
             this.formSubmitHandler( event );
         })
 
+
     }
-
-
     async formSubmitHandler( event ) {
         event.preventDefault();
 
-        let $form = event.target,
-            dateVal = $form.dateInput.value,
-            category = $form.category.value;
+        const $form = event.target;
 
-
-        let filterItems = {
-            dateVal: dateVal,
-            category: category
+        let itemsToFilter = {
+            dateVal: $form.dateInput.value,
+            category: $form.category.value,
         }
 
+        if( dateValidator( itemsToFilter.dateVal ) === false ) {
+            alert('некорректная дата')
+            return false;
+        }
 
-        let posts = new APIHandler( postsApiUrl )
-        let allPosts = await posts.getPosts( 1, -1 );
+        let getAllPosts = await fetchPosts()
 
-        const filteredData = allPosts.filter(item =>
-            item.categories.some(child => child.cat_name === category)
-        );
+        if (!itemsToFilter.dateVal && !itemsToFilter.category) {
+            listHandler( getAllPosts, 1 )
+            return false;
+        }
 
-        this.pagination = null;
-        postsList.innerHTML = filteredData.map(item => Card(item)).join('')
+        const filteredPosts = getAllPosts
+            .filter(item => {
+                const itemDate = item.date.substring(0, 10);
 
+                if( itemsToFilter.dateVal === '' ) {
+                    return item.categories.some(child => child.cat_name === itemsToFilter.category)
+                } else if( itemsToFilter.category === '' ) {
+                    return itemDate === itemsToFilter.dateVal
+                }
+                return (
+                    item.categories.some(child => child.cat_name === itemsToFilter.category) &&
+                    itemDate === itemsToFilter.dateVal // Сравнение с itemsToFilter.dateVal
+                );
+            });
+
+        listHandler( filteredPosts, 1 )
     }
+
+
+
 }

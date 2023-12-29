@@ -1,3 +1,5 @@
+import removeButton from "../../Common/removeButton";
+
 export default class Input{
     constructor( input ) {
         this.input = input;
@@ -6,6 +8,7 @@ export default class Input{
     init() {
         this.input.addEventListener('input', event => {
             this.inputDateMask(event);
+
         });
 
         this.input.addEventListener('focus', event => {
@@ -25,6 +28,10 @@ export default class Input{
         }
 
         input.value = value;
+
+        if( this.input.value !== null ) {
+            removeButton( this.input )
+        }
     }
 
     inputFocusMask( event ) {

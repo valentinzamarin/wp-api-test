@@ -3,6 +3,7 @@
 namespace inc;
 
 use inc\theme\CatRoutes;
+use inc\theme\SendCategories;
 use inc\theme\Setup;
 use inc\theme\PostRoutes;
 
@@ -25,3 +26,4 @@ if ( function_exists( '__autoload' ) ) {
 Setup::instance();
 PostRoutes::instance();
 CatRoutes::instance();
+SendCategories::instance();

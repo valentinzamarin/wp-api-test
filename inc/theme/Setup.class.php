@@ -38,6 +38,8 @@ final class Setup {
             [
                 'postsApiUrl' => site_url() . '/wp-json/list/v2/posts',
                 'catApiUrl'  => site_url() . '/wp-json/hierarchy_cats/v2/categories',
+                'nonce' => wp_create_nonce('send_cats'),
+                'ajax_url' => admin_url('admin-ajax.php')
             ]
         );
 
